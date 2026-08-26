@@ -11,5 +11,4 @@ target/
 *.iws
 .vscode/
 
-# Local credentials config
-src/main/resources/application-local.properties
+
