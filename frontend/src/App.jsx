@@ -1,19 +1,13 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-interface HealthResponse {
-  status: string;
-  message: string;
-  database?: string;
-}
-
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export default function App() {
-  const [backendStatus, setBackendStatus] = useState<'UP' | 'DOWN' | 'CHECKING'>('CHECKING');
-  const [backendMsg, setBackendMsg] = useState<string>('Initializing health check...');
-  const [dbStatus, setDbStatus] = useState<'UP' | 'DOWN' | 'CHECKING'>('CHECKING');
-  const [dbMsg, setDbMsg] = useState<string>('Initializing database connection check...');
+  const [backendStatus, setBackendStatus] = useState('CHECKING');
+  const [backendMsg, setBackendMsg] = useState('Initializing health check...');
+  const [dbStatus, setDbStatus] = useState('CHECKING');
+  const [dbMsg, setDbMsg] = useState('Initializing database connection check...');
 
   const runDiagnostics = async () => {
     setBackendStatus('CHECKING');
@@ -23,7 +17,7 @@ export default function App() {
 
     // 1. Check Backend Health
     try {
-      const response = await axios.get<HealthResponse>(`${API_URL}/api/health`);
+      const response = await axios.get(`${API_URL}/api/health`);
       if (response.data.status === 'UP') {
         setBackendStatus('UP');
         setBackendMsg(response.data.message || 'Server is responsive.');
@@ -31,7 +25,7 @@ export default function App() {
         setBackendStatus('DOWN');
         setBackendMsg('Backend returned non-UP status.');
       }
-    } catch (err: any) {
+    } catch (err) {
       setBackendStatus('DOWN');
       setBackendMsg(
         err.response?.data?.message || err.message || 'Cannot reach the backend server. Is it running?'
@@ -40,7 +34,7 @@ export default function App() {
 
     // 2. Check Database Health
     try {
-      const response = await axios.get<HealthResponse>(`${API_URL}/api/health/db`);
+      const response = await axios.get(`${API_URL}/api/health/db`);
       if (response.data.status === 'UP') {
         setDbStatus('UP');
         setDbMsg(response.data.message || 'Connected to MySQL successfully.');
@@ -48,7 +42,7 @@ export default function App() {
         setDbStatus('DOWN');
         setDbMsg(response.data.message || 'Database ping returned non-UP status.');
       }
-    } catch (err: any) {
+    } catch (err) {
       setDbStatus('DOWN');
       setDbMsg(
         err.response?.data?.message || err.message || 'Failed to establish connection to database via backend.'
