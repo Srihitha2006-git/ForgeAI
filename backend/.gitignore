@@ -10,5 +10,6 @@ target/
 *.iml
 *.iws
 .vscode/
+.env
 
 

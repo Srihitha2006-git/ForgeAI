@@ -41,13 +41,24 @@ public class ProductController {
         if (product.getStockQuantity() < 0) {
             return ResponseEntity.badRequest().body(createErrorResponse("Product stock quantity cannot be negative."));
         }
+        if (product.getCategory() == null) {
+            return ResponseEntity.badRequest().body(createErrorResponse("Product category is required."));
+        }
 
         Product newProduct = new Product(
             product.getName().trim(),
             product.getDescription() != null ? product.getDescription().trim() : null,
             product.getPrice(),
-            product.getStockQuantity()
+            product.getStockQuantity(),
+            product.getCategory(),
+            product.getBrand() != null ? product.getBrand().trim() : null,
+            product.getSku() != null ? product.getSku().trim() : null,
+            product.getImageUrl() != null ? product.getImageUrl().trim() : null
         );
+        if (product.getActive() != null) {
+            newProduct.setActive(product.getActive());
+        }
+
         Product savedProduct = productRepository.save(newProduct);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
     }
@@ -89,12 +100,22 @@ public class ProductController {
         if (product.getStockQuantity() < 0) {
             return ResponseEntity.badRequest().body(createErrorResponse("Product stock quantity cannot be negative."));
         }
+        if (product.getCategory() == null) {
+            return ResponseEntity.badRequest().body(createErrorResponse("Product category is required."));
+        }
 
         Product existingProduct = optionalProduct.get();
         existingProduct.setName(product.getName().trim());
         existingProduct.setDescription(product.getDescription() != null ? product.getDescription().trim() : null);
         existingProduct.setPrice(product.getPrice());
         existingProduct.setStockQuantity(product.getStockQuantity());
+        existingProduct.setCategory(product.getCategory());
+        existingProduct.setBrand(product.getBrand() != null ? product.getBrand().trim() : null);
+        existingProduct.setSku(product.getSku() != null ? product.getSku().trim() : null);
+        existingProduct.setImageUrl(product.getImageUrl() != null ? product.getImageUrl().trim() : null);
+        if (product.getActive() != null) {
+            existingProduct.setActive(product.getActive());
+        }
 
         Product updatedProduct = productRepository.save(existingProduct);
         return ResponseEntity.ok(updatedProduct);

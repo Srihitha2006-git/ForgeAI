@@ -1,5 +1,6 @@
 package com.forgeai.backend.controller;
 
+import com.forgeai.backend.config.JwtUtil;
 import com.forgeai.backend.dto.LoginRequest;
 import com.forgeai.backend.dto.LoginResponse;
 import com.forgeai.backend.dto.RegisterRequest;
@@ -65,12 +66,16 @@ public class AuthController {
         );
         User savedUser = userRepository.save(user);
 
-        // Return response without password
+        // Generate JWT Token
+        String token = JwtUtil.generateToken(savedUser.getId(), savedUser.getEmail());
+
+        // Return response without password but with token
         RegisterResponse response = new RegisterResponse(
             savedUser.getId(),
             savedUser.getName(),
             savedUser.getEmail(),
-            "User registered successfully."
+            "User registered successfully.",
+            token
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -99,12 +104,16 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(createErrorResponse("Invalid email or password."));
         }
 
-        // Return safe response
+        // Generate JWT Token
+        String token = JwtUtil.generateToken(user.getId(), user.getEmail());
+
+        // Return safe response with token
         LoginResponse response = new LoginResponse(
             user.getId(),
             user.getName(),
             user.getEmail(),
-            "Login successful."
+            "Login successful.",
+            token
         );
 
         return ResponseEntity.ok(response);
