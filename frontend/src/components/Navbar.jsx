@@ -14,7 +14,9 @@ export default function Navbar({
   onCartClick,
   onWishlistClick,
   onAddressesClick,
-  onOrdersClick
+  onOrdersClick,
+  onAdminDashboardClick,
+  onAdminProductsClick
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -48,6 +50,23 @@ export default function Navbar({
           >
             Diagnostics
           </button>
+
+          {user?.role === 'ADMIN' && (
+            <button 
+              className={`navbar-tab ${activeTab === 'admin-dashboard' ? 'active' : ''}`}
+              onClick={onAdminDashboardClick}
+              aria-label="View Admin Dashboard"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: activeTab === 'admin-dashboard' ? 'white' : '#818cf8' }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              Admin Dashboard
+            </button>
+          )}
         </div>
 
         {/* RIGHT: HEALTH PILLS & ACTION ICONS */}
@@ -125,6 +144,67 @@ export default function Navbar({
                     <div style={{ color: 'white', fontWeight: 600, fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</div>
                     <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</div>
                   </div>
+
+                  {user.role === 'ADMIN' && (
+                    <>
+                      <button 
+                        onClick={() => {
+                        onAdminDashboardClick();
+                        setIsDropdownOpen(false);
+                      }}
+                      style={{
+                        background: 'rgba(99, 102, 241, 0.15)',
+                        border: '1px solid rgba(99, 102, 241, 0.35)',
+                        borderRadius: '6px',
+                        color: '#a5b4fc',
+                        textAlign: 'left',
+                        padding: '0.4rem 0.6rem',
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                      </svg>
+                      Admin Dashboard
+                    </button>
+                    <button 
+                      onClick={() => {
+                        if (onAdminProductsClick) onAdminProductsClick();
+                        else if (onAdminDashboardClick) onAdminDashboardClick();
+                        setIsDropdownOpen(false);
+                      }}
+                      style={{
+                        background: 'rgba(99, 102, 241, 0.05)',
+                        border: '1px solid rgba(99, 102, 241, 0.2)',
+                        borderRadius: '4px',
+                        color: '#c7d2fe',
+                        textAlign: 'left',
+                        padding: '0.4rem 0.6rem',
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                      </svg>
+                      Manage Products
+                    </button>
+                  </>
+                )}
                   
                   <button 
                     onClick={() => {

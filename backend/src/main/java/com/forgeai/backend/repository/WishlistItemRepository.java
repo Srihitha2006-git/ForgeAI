@@ -9,4 +9,9 @@ import java.util.Optional;
 @Repository
 public interface WishlistItemRepository extends JpaRepository<WishlistItem, Long> {
     Optional<WishlistItem> findByWishlistIdAndProductId(Long wishlistId, Long productId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.transaction.annotation.Transactional
+    @org.springframework.data.jpa.repository.Query("DELETE FROM WishlistItem wi WHERE wi.product.id = :productId")
+    void deleteByProductId(@org.springframework.data.repository.query.Param("productId") Long productId);
 }
