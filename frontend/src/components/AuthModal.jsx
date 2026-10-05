@@ -26,7 +26,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess, apiUrl }) {
           const userData = {
             id: response.data.id,
             name: response.data.name,
-            email: response.data.email
+            email: response.data.email,
+            role: response.data.role || 'CUSTOMER'
           };
           localStorage.setItem('token', response.data.token);
           localStorage.setItem('user', JSON.stringify(userData));
@@ -45,7 +46,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess, apiUrl }) {
           const userData = {
             id: response.data.id,
             name: response.data.name,
-            email: response.data.email
+            email: response.data.email,
+            role: response.data.role || 'CUSTOMER'
           };
           localStorage.setItem('token', response.data.token);
           localStorage.setItem('user', JSON.stringify(userData));

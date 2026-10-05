@@ -11,11 +11,15 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderTrackingRepository orderTrackingRepository;
+    private final InventoryService inventoryService;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, OrderTrackingRepository orderTrackingRepository) {
+    public OrderService(OrderRepository orderRepository,
+                        OrderTrackingRepository orderTrackingRepository,
+                        InventoryService inventoryService) {
         this.orderRepository = orderRepository;
         this.orderTrackingRepository = orderTrackingRepository;
+        this.inventoryService = inventoryService;
     }
 
     @Transactional
@@ -27,6 +31,19 @@ public class OrderService {
 
         order.setStatus(newStatus);
         orderRepository.save(order);
+
+        // If order is cancelled, restock items back into inventory
+        if (newStatus == OrderStatus.CANCELLED) {
+            for (OrderItem item : order.getOrderItems()) {
+                if (item.getProduct() != null && item.getQuantity() != null && item.getQuantity() > 0) {
+                    inventoryService.restockFromCancelledOrder(
+                            item.getProduct(),
+                            item.getQuantity(),
+                            "Order cancelled: " + order.getOrderNumber()
+                    );
+                }
+            }
+        }
 
         OrderTracking tracking = new OrderTracking(order, newStatus, description);
         orderTrackingRepository.save(tracking);

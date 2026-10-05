@@ -15,6 +15,12 @@ public class JwtAuthenticationInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        // If already authenticated by Spring Security JwtAuthenticationFilter
+        Object authenticatedUserId = request.getAttribute("authenticatedUserId");
+        if (authenticatedUserId instanceof Long) {
+            return true;
+        }
+
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

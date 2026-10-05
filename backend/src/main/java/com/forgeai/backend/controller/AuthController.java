@@ -58,24 +58,26 @@ public class AuthController {
         // Hash the password
         String hashedPassword = passwordEncoder.encode(request.getPassword());
 
-        // Save User
+        // Save User - Always assign CUSTOMER role during public registration
         User user = new User(
             request.getName().trim(),
             request.getEmail().trim(),
-            hashedPassword
+            hashedPassword,
+            com.forgeai.backend.entity.Role.CUSTOMER
         );
         User savedUser = userRepository.save(user);
 
-        // Generate JWT Token
-        String token = JwtUtil.generateToken(savedUser.getId(), savedUser.getEmail());
+        // Generate JWT Token with CUSTOMER role
+        String token = JwtUtil.generateToken(savedUser.getId(), savedUser.getEmail(), savedUser.getRole().name());
 
-        // Return response without password but with token
+        // Return response without password but with token and role
         RegisterResponse response = new RegisterResponse(
             savedUser.getId(),
             savedUser.getName(),
             savedUser.getEmail(),
             "User registered successfully.",
-            token
+            token,
+            savedUser.getRole().name()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -104,16 +106,19 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(createErrorResponse("Invalid email or password."));
         }
 
-        // Generate JWT Token
-        String token = JwtUtil.generateToken(user.getId(), user.getEmail());
+        com.forgeai.backend.entity.Role userRole = user.getRole() != null ? user.getRole() : com.forgeai.backend.entity.Role.CUSTOMER;
 
-        // Return safe response with token
+        // Generate JWT Token with user's actual role
+        String token = JwtUtil.generateToken(user.getId(), user.getEmail(), userRole.name());
+
+        // Return safe response with token and role
         LoginResponse response = new LoginResponse(
             user.getId(),
             user.getName(),
             user.getEmail(),
             "Login successful.",
-            token
+            token,
+            userRole.name()
         );
 
         return ResponseEntity.ok(response);

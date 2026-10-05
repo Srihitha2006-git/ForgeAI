@@ -2,9 +2,12 @@ package com.forgeai.backend.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -24,6 +27,10 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20, columnDefinition = "varchar(20) default 'CUSTOMER'")
+    private Role role = Role.CUSTOMER;
+
     public User() {
     }
 
@@ -31,6 +38,21 @@ public class User {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.role = Role.CUSTOMER;
+    }
+
+    public User(String name, String email, String password, Role role) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.role = role != null ? role : Role.CUSTOMER;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (this.role == null) {
+            this.role = Role.CUSTOMER;
+        }
     }
 
     public Long getId() {
@@ -63,5 +85,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role != null ? role : Role.CUSTOMER;
     }
 }

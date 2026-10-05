@@ -5,13 +5,22 @@ import com.forgeai.backend.entity.ProductCategory;
 import com.forgeai.backend.repository.ProductRepository;
 import com.forgeai.backend.repository.CartItemRepository;
 import com.forgeai.backend.repository.WishlistItemRepository;
+import com.forgeai.backend.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import com.forgeai.backend.entity.Role;
+import com.forgeai.backend.entity.User;
+import com.forgeai.backend.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class DatabaseSeeder implements CommandLineRunner {
@@ -19,24 +28,83 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final ProductRepository productRepository;
     private final CartItemRepository cartItemRepository;
     private final WishlistItemRepository wishlistItemRepository;
+    private final InventoryService inventoryService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate jdbcTemplate;
+
+    @Value("${admin.provision.enabled:true}")
+    private boolean adminProvisionEnabled;
+
+    @Value("${admin.provision.email:admin@forgeai.com}")
+    private String adminEmail;
+
+    @Value("${admin.provision.password:Admin@ForgeAI2026!}")
+    private String adminPassword;
+
+    @Value("${admin.provision.name:ForgeAI Administrator}")
+    private String adminName;
 
     @Autowired
     public DatabaseSeeder(ProductRepository productRepository,
                           CartItemRepository cartItemRepository,
-                          WishlistItemRepository wishlistItemRepository) {
+                          WishlistItemRepository wishlistItemRepository,
+                          InventoryService inventoryService,
+                          UserRepository userRepository,
+                          PasswordEncoder passwordEncoder,
+                          JdbcTemplate jdbcTemplate) {
         this.productRepository = productRepository;
         this.cartItemRepository = cartItemRepository;
         this.wishlistItemRepository = wishlistItemRepository;
+        this.inventoryService = inventoryService;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     public void run(String... args) throws Exception {
         System.out.println("Executing database seeder initialization check...");
 
+        // 1. Backfill roles for any existing users with null role
+        try {
+            jdbcTemplate.execute("UPDATE users SET role = 'CUSTOMER' WHERE role IS NULL");
+        } catch (Exception e) {
+            System.out.println("Role backfill note: " + e.getMessage());
+        }
+
+        // 2. Safe admin provisioning
+        if (adminProvisionEnabled && adminEmail != null && !adminEmail.isBlank()) {
+            Optional<User> existingUser = userRepository.findByEmail(adminEmail.trim());
+            if (existingUser.isEmpty()) {
+                User admin = new User(
+                    adminName.trim(),
+                    adminEmail.trim(),
+                    passwordEncoder.encode(adminPassword),
+                    Role.ADMIN
+                );
+                userRepository.save(admin);
+                System.out.println("Default admin user provisioned successfully: " + adminEmail);
+            } else {
+                User u = existingUser.get();
+                if (u.getRole() == Role.ADMIN) {
+                    System.out.println("Admin account already provisioned: " + adminEmail + ". Skipping re-provisioning.");
+                } else {
+                    System.out.println("Notice: User with email " + adminEmail + " exists with role " + u.getRole() + ". Account not modified to prevent unintended privilege escalation.");
+                }
+            }
+        }
+
+        // 3. Product & inventory seeding
         // Only seed if the products table is empty.
         // This prevents foreign key violations with orders/order_items when restarting the server.
         if (productRepository.count() > 0) {
-            System.out.println("Database already seeded with products. Skipping seeder.");
+            System.out.println("Database already seeded with products. Synchronizing inventory records...");
+            List<Product> existingProducts = productRepository.findAll();
+            for (Product p : existingProducts) {
+                inventoryService.getOrCreateInventory(p);
+            }
+            System.out.println("Inventory synchronized for " + existingProducts.size() + " products.");
             return;
         }
 
@@ -228,7 +296,11 @@ public class DatabaseSeeder implements CommandLineRunner {
             )
         );
 
-        productRepository.saveAll(products);
-        System.out.println("Successfully seeded database with " + products.size() + " home & enterprise marketplace products.");
+        List<Product> savedProducts = productRepository.saveAll(products);
+        for (Product p : savedProducts) {
+            inventoryService.getOrCreateInventory(p);
+        }
+
+        System.out.println("Successfully seeded database with " + products.size() + " products and inventory records.");
     }
 }

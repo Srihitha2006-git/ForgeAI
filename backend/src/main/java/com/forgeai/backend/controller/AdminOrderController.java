@@ -84,8 +84,15 @@ public class AdminOrderController {
     public ResponseEntity<?> updateOrderStatus(@PathVariable Long id,
                                                @RequestHeader(value = "X-Admin-Secret", required = false) String adminSecret,
                                                @RequestBody Map<String, String> payload) {
-        if (adminSecret == null || !adminSecret.equals(expectedAdminSecret)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(createErrorResponse("Access denied: Invalid administrator secret key."));
+        boolean hasAdminRole = false;
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getAuthorities() != null &&
+            auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            hasAdminRole = true;
+        }
+
+        if (!hasAdminRole && (adminSecret == null || !adminSecret.equals(expectedAdminSecret))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(createErrorResponse("Access denied: Invalid administrator authorization or secret key."));
         }
 
         String statusStr = payload.get("status");

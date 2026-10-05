@@ -1,7 +1,9 @@
 package com.forgeai.backend.controller;
 
+import com.forgeai.backend.dto.UpdateInventoryRequest;
 import com.forgeai.backend.entity.Product;
 import com.forgeai.backend.repository.ProductRepository;
+import com.forgeai.backend.service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +20,12 @@ import java.util.Optional;
 public class ProductController {
 
     private final ProductRepository productRepository;
+    private final InventoryService inventoryService;
 
     @Autowired
-    public ProductController(ProductRepository productRepository) {
+    public ProductController(ProductRepository productRepository, InventoryService inventoryService) {
         this.productRepository = productRepository;
+        this.inventoryService = inventoryService;
     }
 
     @PostMapping
@@ -60,6 +64,8 @@ public class ProductController {
         }
 
         Product savedProduct = productRepository.save(newProduct);
+        inventoryService.getOrCreateInventory(savedProduct);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProduct);
     }
 
@@ -108,13 +114,17 @@ public class ProductController {
         existingProduct.setName(product.getName().trim());
         existingProduct.setDescription(product.getDescription() != null ? product.getDescription().trim() : null);
         existingProduct.setPrice(product.getPrice());
-        existingProduct.setStockQuantity(product.getStockQuantity());
         existingProduct.setCategory(product.getCategory());
         existingProduct.setBrand(product.getBrand() != null ? product.getBrand().trim() : null);
         existingProduct.setSku(product.getSku() != null ? product.getSku().trim() : null);
         existingProduct.setImageUrl(product.getImageUrl() != null ? product.getImageUrl().trim() : null);
         if (product.getActive() != null) {
             existingProduct.setActive(product.getActive());
+        }
+
+        // Sync stock through inventory service
+        if (!existingProduct.getStockQuantity().equals(product.getStockQuantity())) {
+            inventoryService.updateInventory(existingProduct.getId(), new UpdateInventoryRequest(null, product.getStockQuantity()));
         }
 
         Product updatedProduct = productRepository.save(existingProduct);

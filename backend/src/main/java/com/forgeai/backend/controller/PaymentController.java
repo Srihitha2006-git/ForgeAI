@@ -33,6 +33,7 @@ public class PaymentController {
     private final OrderRepository orderRepository;
     private final AddressRepository addressRepository;
     private final OrderTrackingRepository orderTrackingRepository;
+    private final com.forgeai.backend.service.InventoryService inventoryService;
 
     @Value("${razorpay.key.id}")
     private String razorpayKeyId;
@@ -47,7 +48,8 @@ public class PaymentController {
                              PaymentRepository paymentRepository,
                              OrderRepository orderRepository,
                              AddressRepository addressRepository,
-                             OrderTrackingRepository orderTrackingRepository) {
+                             OrderTrackingRepository orderTrackingRepository,
+                             com.forgeai.backend.service.InventoryService inventoryService) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.cartRepository = cartRepository;
@@ -55,6 +57,7 @@ public class PaymentController {
         this.orderRepository = orderRepository;
         this.addressRepository = addressRepository;
         this.orderTrackingRepository = orderTrackingRepository;
+        this.inventoryService = inventoryService;
     }
 
     private Long getAuthenticatedUserId(HttpServletRequest request) {
@@ -275,10 +278,8 @@ public class PaymentController {
                     throw new RuntimeException("Insufficient stock for " + product.getName() + ". Only " + product.getStockQuantity() + " available.");
                 }
 
-                // Reduce stock
-                int finalStock = product.getStockQuantity() - item.getQuantity();
-                product.setStockQuantity(finalStock);
-                productRepository.save(product);
+                // Reduce stock safely and record transaction in authoritative inventory
+                inventoryService.commitSoldStock(product, item.getQuantity(), "Order purchase: " + orderNumber);
 
                 // Add OrderItem
                 OrderItem orderItem = new OrderItem(
