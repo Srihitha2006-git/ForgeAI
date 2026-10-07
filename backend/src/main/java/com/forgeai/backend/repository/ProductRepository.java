@@ -17,6 +17,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findTop10ByOrderByIdDesc();
 
+    @Query("SELECT p.category, COUNT(p) FROM Product p WHERE p.category IS NOT NULL GROUP BY p.category")
+    List<Object[]> countProductsByCategory();
+
     java.util.Optional<Product> findBySku(String sku);
 
     boolean existsBySku(String sku);

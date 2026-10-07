@@ -203,9 +203,8 @@ export default function AdminDashboardPage({ user: propUser, token: propToken, n
           </button>
 
           <button 
-            className="admin-nav-item disabled" 
-            title="Order management UI will be available in Phase 4E"
-            disabled
+            className={`admin-nav-item ${activeTab === 'orders' ? 'active' : ''}`}
+            onClick={() => navigateTo ? navigateTo('/admin/orders') : setActiveTab('orders')}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="21" r="1"></circle>
@@ -213,22 +212,20 @@ export default function AdminDashboardPage({ user: propUser, token: propToken, n
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
             <span>Orders</span>
-            <span className="admin-nav-tag future">Phase 4E</span>
+            <span className="admin-nav-tag live">LIVE</span>
           </button>
 
           <button 
-            className="admin-nav-item disabled" 
-            title="Customer management UI will be available in Phase 4F"
-            disabled
+            className="admin-nav-item" 
+            onClick={() => navigateTo ? navigateTo('/admin/analytics') : null}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
             </svg>
-            <span>Customers</span>
-            <span className="admin-nav-tag future">Phase 4F</span>
+            <span>Analytics</span>
+            <span className="admin-nav-tag live" style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' }}>PHASE 4F</span>
           </button>
         </nav>
 
@@ -537,16 +534,6 @@ export default function AdminDashboardPage({ user: propUser, token: propToken, n
                 </div>
 
                 <div className="order-status-grid">
-                  <div className="order-status-chip">
-                    <span className="status-chip-dot placed"></span>
-                    <span className="status-chip-name">Placed</span>
-                    <span className="status-chip-val">{dashboardData.orderStatusCounts?.placed || 0}</span>
-                  </div>
-                  <div className="order-status-chip">
-                    <span className="status-chip-dot confirmed"></span>
-                    <span className="status-chip-name">Confirmed</span>
-                    <span className="status-chip-val">{dashboardData.orderStatusCounts?.confirmed || 0}</span>
-                  </div>
                   <div className="order-status-chip">
                     <span className="status-chip-dot processing"></span>
                     <span className="status-chip-name">Processing</span>

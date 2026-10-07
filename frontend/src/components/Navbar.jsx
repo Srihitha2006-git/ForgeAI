@@ -16,7 +16,9 @@ export default function Navbar({
   onAddressesClick,
   onOrdersClick,
   onAdminDashboardClick,
-  onAdminProductsClick
+  onAdminProductsClick,
+  onAdminOrdersClick,
+  onAdminAnalyticsClick
 }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -202,6 +204,62 @@ export default function Navbar({
                         <line x1="12" y1="22.08" x2="12" y2="12"></line>
                       </svg>
                       Manage Products
+                    </button>
+                    <button 
+                      onClick={() => {
+                        if (onAdminOrdersClick) onAdminOrdersClick();
+                        else if (onAdminDashboardClick) onAdminDashboardClick();
+                        setIsDropdownOpen(false);
+                      }}
+                      style={{
+                        background: 'rgba(99, 102, 241, 0.05)',
+                        border: '1px solid rgba(99, 102, 241, 0.2)',
+                        borderRadius: '4px',
+                        color: '#c7d2fe',
+                        textAlign: 'left',
+                        padding: '0.4rem 0.6rem',
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                      </svg>
+                      Manage Orders
+                    </button>
+                    <button 
+                      onClick={() => {
+                        if (onAdminAnalyticsClick) onAdminAnalyticsClick();
+                        else if (onAdminDashboardClick) onAdminDashboardClick();
+                        setIsDropdownOpen(false);
+                      }}
+                      style={{
+                        background: 'rgba(16, 185, 129, 0.08)',
+                        border: '1px solid rgba(16, 185, 129, 0.25)',
+                        borderRadius: '4px',
+                        color: '#6ee7b7',
+                        textAlign: 'left',
+                        padding: '0.4rem 0.6rem',
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                      </svg>
+                      Admin Analytics
                     </button>
                   </>
                 )}

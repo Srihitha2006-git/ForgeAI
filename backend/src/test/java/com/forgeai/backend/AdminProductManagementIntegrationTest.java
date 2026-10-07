@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forgeai.backend.config.JwtUtil;
 import com.forgeai.backend.entity.*;
 import com.forgeai.backend.repository.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,9 @@ public class AdminProductManagementIntegrationTest {
 
     @Autowired
     private InventoryRepository inventoryRepository;
+
+    @Autowired
+    private InventoryTransactionRepository inventoryTransactionRepository;
 
     @Autowired
     private OrderRepository orderRepository;
@@ -87,6 +91,30 @@ public class AdminProductManagementIntegrationTest {
             testCustomer = userRepository.save(testCustomer);
         } else {
             testCustomer = existingCustomer.get();
+        }
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (testCustomer != null) {
+            List<Order> orders = orderRepository.findByUserOrderByCreatedAtDesc(testCustomer);
+            for (Order o : orders) {
+                orderRepository.delete(o);
+            }
+        }
+        List<Product> testProducts = productRepository.findAll().stream()
+                .filter(p -> p.getSku() != null && (
+                        p.getSku().startsWith("TEST-") ||
+                        p.getSku().startsWith("TOGGLE-") ||
+                        p.getSku().startsWith("HIST-") ||
+                        p.getSku().startsWith("UNREF-") ||
+                        p.getSku().startsWith("CUST-")
+                ))
+                .toList();
+        for (Product p : testProducts) {
+            inventoryTransactionRepository.deleteByProductId(p.getId());
+            inventoryRepository.deleteByProductId(p.getId());
+            productRepository.delete(p);
         }
     }
 

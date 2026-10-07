@@ -158,7 +158,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                 ProductCategory.KITCHEN_UTENSILS,
                 "SilverSleek",
                 "KIT-CUT-PREM-20",
-                "https://images.unsplash.com/photo-1543510473-ac2c35329a28?q=80&w=600&auto=format&fit=crop"
+                "https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?q=80&w=600&auto=format&fit=crop"
             ),
             new Product(
                 "Pressure Cooker",

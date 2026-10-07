@@ -488,9 +488,8 @@ export default function AdminProductsPage({ user: propUser, token: propToken, na
           </button>
 
           <button 
-            className="admin-nav-item disabled" 
-            title="Order management UI will be available in Phase 4E"
-            disabled
+            className="admin-nav-item" 
+            onClick={() => navigateTo('/admin/orders')}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="9" cy="21" r="1"></circle>
@@ -498,7 +497,20 @@ export default function AdminProductsPage({ user: propUser, token: propToken, na
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
             <span>Orders</span>
-            <span className="admin-nav-tag future">Phase 4E</span>
+            <span className="admin-nav-tag live">LIVE</span>
+          </button>
+
+          <button 
+            className="admin-nav-item" 
+            onClick={() => navigateTo('/admin/analytics')}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>Analytics</span>
+            <span className="admin-nav-tag live" style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)' }}>PHASE 4F</span>
           </button>
         </nav>
 

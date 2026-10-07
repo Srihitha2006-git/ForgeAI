@@ -8,12 +8,13 @@ import ProductCard from './ProductCard';
 import LoadingSkeleton from './LoadingSkeleton';
 import ErrorState from './ErrorState';
 import EmptyState from './EmptyState';
+import cookwareBg from '../assets/cookware-hero.jpg';
 
 export default function ProductCatalog({ apiUrl, onProductClick, token, onAuthTrigger, onCartCountChange, onShowToast, wishlistItems, onWishlistCountChange, onWishlistItemsChange }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Filtering and sorting state
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -113,20 +114,33 @@ export default function ProductCatalog({ apiUrl, onProductClick, token, onAuthTr
       {/* 1. HERO SECTION */}
       <Hero />
 
-      {/* 2. SEARCH BAR */}
-      <SearchBar 
-        searchQuery={searchQuery} 
-        onSearchChange={handleSearchChange} 
-      />
+      {/* 2. SEARCH, CATEGORY FILTER & SERVICE FEATURES SECTION WITH UTENSILS BACKDROP */}
+      <section className="search-features-section-wrapper" aria-label="Search and Category Filters">
+        <div
+          className="search-features-bg-backdrop"
+          style={{ backgroundImage: `url(${cookwareBg})` }}
+          role="img"
+          aria-label="Kitchen utensils and cookware marketplace background"
+        >
+          <div className="search-features-bg-overlay"></div>
+        </div>
 
-      {/* 3. CATEGORY PILLS FILTER */}
-      <CategoryFilter 
-        activeCategory={selectedCategory} 
-        onCategoryChange={handleCategoryChange} 
-      />
+        <div className="search-features-content-container">
+          <SearchBar
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+          />
 
-      {/* 4. BUSINESS BENEFIT CARDS */}
-      <ServiceFeatures />
+          <div id="category-filter-section">
+            <CategoryFilter
+              activeCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+            />
+          </div>
+
+          <ServiceFeatures />
+        </div>
+      </section>
 
       {/* 5. DYNAMIC PRODUCT GRID VIEW */}
       {loading ? (
@@ -136,55 +150,67 @@ export default function ProductCatalog({ apiUrl, onProductClick, token, onAuthTr
       ) : products.length === 0 ? (
         <EmptyState />
       ) : (
-        <div className="container" style={{ width: '100%' }}>
-          {/* Header layout for grid section with left accent and right sort drop-down */}
-          <div className="catalog-section-header">
-            <h2 className="catalog-section-title">
-              <span className="catalog-title-accent"></span>
-              Featured Products
-            </h2>
-            
-            <div className="sort-container">
-              <label htmlFor="sort-select-dropdown" className="sort-label">Sort By:</label>
-              <select 
-                id="sort-select-dropdown" 
-                className="sort-select" 
-                value={sortBy} 
-                onChange={handleSortChange}
-              >
-                <option value="NEWEST">Newest</option>
-                <option value="PRICE_LOW_HIGH">Price: Low to High</option>
-                <option value="PRICE_HIGH_LOW">Price: High to Low</option>
-                <option value="NAME_A_Z">Name: A-Z</option>
-              </select>
-            </div>
+        <section className="products-catalog-section-wrapper">
+          {/* Utensils image background for the products backside */}
+          <div
+            className="products-bg-backdrop"
+            style={{ backgroundImage: `url(${cookwareBg})` }}
+            role="img"
+            aria-label="Cookware marketplace background"
+          >
+            <div className="products-bg-overlay"></div>
           </div>
 
-          {/* 4-Column Product Grid */}
-          {processedProducts.length === 0 ? (
-            <div className="empty-state" style={{ margin: '2rem auto' }}>
-              <h3>No products found</h3>
-              <p style={{ marginTop: '0.5rem' }}>No products match your search or filter criteria.</p>
+          <div id="catalog-products-section" className="container" style={{ width: '100%', position: 'relative', zIndex: 5 }}>
+            {/* Header layout for grid section with left accent and right sort drop-down */}
+            <div className="catalog-section-header">
+              <h2 className="catalog-section-title">
+                <span className="catalog-title-accent"></span>
+                Featured Products
+              </h2>
+
+              <div className="sort-container">
+                <label htmlFor="sort-select-dropdown" className="sort-label">Sort By:</label>
+                <select
+                  id="sort-select-dropdown"
+                  className="sort-select"
+                  value={sortBy}
+                  onChange={handleSortChange}
+                >
+                  <option value="NEWEST">Newest</option>
+                  <option value="PRICE_LOW_HIGH">Price: Low to High</option>
+                  <option value="PRICE_HIGH_LOW">Price: High to Low</option>
+                  <option value="NAME_A_Z">Name: A-Z</option>
+                </select>
+              </div>
             </div>
-          ) : (
-            <div className="product-catalog-grid">
-              {processedProducts.map((product) => (
-                <ProductCard 
-                  key={product.id || product.sku} 
-                  product={product} 
-                  onProductClick={onProductClick}
-                  token={token}
-                  onAuthTrigger={onAuthTrigger}
-                  onCartCountChange={onCartCountChange}
-                  onShowToast={onShowToast}
-                  wishlistItems={wishlistItems}
-                  onWishlistCountChange={onWishlistCountChange}
-                  onWishlistItemsChange={onWishlistItemsChange}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+
+            {/* 4-Column Product Grid */}
+            {processedProducts.length === 0 ? (
+              <div className="empty-state" style={{ margin: '2rem auto' }}>
+                <h3>No products found</h3>
+                <p style={{ marginTop: '0.5rem' }}>No products match your search or filter criteria.</p>
+              </div>
+            ) : (
+              <div className="product-catalog-grid">
+                {processedProducts.map((product) => (
+                  <ProductCard
+                    key={product.id || product.sku}
+                    product={product}
+                    onProductClick={onProductClick}
+                    token={token}
+                    onAuthTrigger={onAuthTrigger}
+                    onCartCountChange={onCartCountChange}
+                    onShowToast={onShowToast}
+                    wishlistItems={wishlistItems}
+                    onWishlistCountChange={onWishlistCountChange}
+                    onWishlistItemsChange={onWishlistItemsChange}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
       )}
 
       {/* FOOTER TEXT BANNER */}

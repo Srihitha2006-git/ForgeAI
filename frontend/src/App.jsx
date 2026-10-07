@@ -12,6 +12,8 @@ import MyOrdersPage from './pages/MyOrdersPage';
 import OrderDetailsPage from './pages/OrderDetailsPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminProductsPage from './pages/AdminProductsPage';
+import AdminOrdersPage from './pages/AdminOrdersPage';
+import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
 import { cartService } from './services/cartService';
 import { wishlistService } from './services/wishlistService';
 
@@ -22,6 +24,17 @@ const getRouteFromUrl = () => {
   const path = window.location.pathname;
   if (path === '/admin/products') {
     return { page: 'admin-products' };
+  }
+  if (path === '/admin/orders') {
+    return { page: 'admin-orders' };
+  }
+  if (path.startsWith('/admin/orders/')) {
+    const idStr = path.split('/admin/orders/')[1];
+    const id = parseInt(idStr, 10);
+    return { page: 'admin-orders', orderId: isNaN(id) ? null : id };
+  }
+  if (path === '/admin/analytics') {
+    return { page: 'admin-analytics' };
   }
   if (path === '/admin/dashboard' || path === '/admin' || path.startsWith('/admin')) {
     return { page: 'admin-dashboard' };
@@ -124,7 +137,7 @@ export default function App() {
 
   // Route guard: if trying to access cart, wishlist, addresses, checkout, orders, or admin dashboard while logged out, redirect and open login
   useEffect(() => {
-    if ((route.page === 'cart' || route.page === 'wishlist' || route.page === 'addresses' || route.page === 'checkout' || route.page === 'orders' || route.page === 'order-details' || route.page === 'admin-dashboard') && !token) {
+    if ((route.page === 'cart' || route.page === 'wishlist' || route.page === 'addresses' || route.page === 'checkout' || route.page === 'orders' || route.page === 'order-details' || route.page.startsWith('admin')) && !token) {
       navigateTo('/');
       setIsAuthModalOpen(true);
     }
@@ -209,7 +222,7 @@ export default function App() {
   // Sync nav tab active view highlighting
   const currentTab = route.page === 'diagnostics' 
     ? 'diagnostics' 
-    : (route.page === 'admin-dashboard' ? 'admin-dashboard' : 'marketplace');
+    : (route.page.startsWith('admin') ? 'admin-dashboard' : 'marketplace');
 
   const handleTabChange = (tab) => {
     if (tab === 'marketplace') {
@@ -243,10 +256,12 @@ export default function App() {
         onOrdersClick={() => navigateTo('/orders')}
         onAdminDashboardClick={() => navigateTo('/admin/dashboard')}
         onAdminProductsClick={() => navigateTo('/admin/products')}
+        onAdminOrdersClick={() => navigateTo('/admin/orders')}
+        onAdminAnalyticsClick={() => navigateTo('/admin/analytics')}
       />
 
       {/* DYNAMIC CONTENT ROUTING AREA */}
-      <div style={{ padding: '2rem 0', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ padding: route.page === 'marketplace' ? '0 0 2rem 0' : '2rem 0', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         {route.page === 'marketplace' && (
           <ProductCatalog 
             apiUrl={API_URL} 
@@ -337,6 +352,25 @@ export default function App() {
 
         {route.page === 'admin-products' && (
           <AdminProductsPage 
+            user={user}
+            token={token}
+            navigateTo={navigateTo}
+            onShowToast={showToast}
+          />
+        )}
+
+        {route.page === 'admin-orders' && (
+          <AdminOrdersPage 
+            user={user}
+            token={token}
+            initialOrderId={route.orderId}
+            navigateTo={navigateTo}
+            onShowToast={showToast}
+          />
+        )}
+
+        {route.page === 'admin-analytics' && (
+          <AdminAnalyticsPage 
             user={user}
             token={token}
             navigateTo={navigateTo}

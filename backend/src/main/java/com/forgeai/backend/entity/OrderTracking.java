@@ -23,8 +23,15 @@ public class OrderTracking {
     @Column(nullable = false)
     private OrderStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "previous_status", nullable = true)
+    private OrderStatus previousStatus;
+
     @Column(nullable = false)
     private String description;
+
+    @Column(name = "changed_by", nullable = true)
+    private String changedBy;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -41,6 +48,14 @@ public class OrderTracking {
         this.order = order;
         this.status = status;
         this.description = description;
+    }
+
+    public OrderTracking(Order order, OrderStatus status, OrderStatus previousStatus, String description, String changedBy) {
+        this.order = order;
+        this.status = status;
+        this.previousStatus = previousStatus;
+        this.description = description;
+        this.changedBy = changedBy;
     }
 
     public Long getId() {
@@ -67,12 +82,28 @@ public class OrderTracking {
         this.status = status;
     }
 
+    public OrderStatus getPreviousStatus() {
+        return previousStatus;
+    }
+
+    public void setPreviousStatus(OrderStatus previousStatus) {
+        this.previousStatus = previousStatus;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getChangedBy() {
+        return changedBy;
+    }
+
+    public void setChangedBy(String changedBy) {
+        this.changedBy = changedBy;
     }
 
     public LocalDateTime getCreatedAt() {

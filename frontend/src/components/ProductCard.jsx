@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { cartService } from '../services/cartService';
 import { wishlistService } from '../services/wishlistService';
+import cookwareBg from '../assets/cookware-hero.jpg';
 
 // Fallback abstract gradients if image fails to load
 const FALLBACK_GRADIENTS = [
@@ -160,10 +161,40 @@ export default function ProductCard({ product, onProductClick, token, onAuthTrig
           />
         ) : (
           <div 
-            className="card-gradient-placeholder" 
-            style={{ background: fallbackGradient }}
+            className="card-img-placeholder-utensils" 
+            style={{ 
+              backgroundImage: `url(${cookwareBg})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              width: '100%',
+              height: '100%',
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
           >
-            {name.substring(0, 2).toUpperCase()}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(180deg, rgba(7, 9, 14, 0.45) 0%, rgba(7, 9, 14, 0.78) 100%)'
+            }} />
+            <span style={{
+              position: 'relative',
+              zIndex: 2,
+              padding: '0.35rem 0.85rem',
+              borderRadius: '8px',
+              background: 'rgba(17, 24, 39, 0.85)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              color: '#ffffff',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              letterSpacing: '0.04em'
+            }}>
+              {name.substring(0, 16)}
+            </span>
           </div>
         )}
       </div>

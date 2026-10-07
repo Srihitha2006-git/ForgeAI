@@ -25,5 +25,18 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.status <> com.forgeai.backend.entity.OrderStatus.CANCELLED")
     BigDecimal calculateTotalRevenue();
 
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.status = com.forgeai.backend.entity.OrderStatus.DELIVERED")
+    BigDecimal calculateDeliveredRevenue();
+
     List<Order> findTop10ByOrderByCreatedAtDesc();
+
+    List<Order> findAllByOrderByCreatedAtDesc();
+
+    List<Order> findAllByOrderByCreatedAtAsc();
+
+    long countByStatusNot(OrderStatus status);
+
+    List<Order> findByStatusOrderByCreatedAtDesc(OrderStatus status);
+
+    Optional<Order> findByOrderNumber(String orderNumber);
 }
