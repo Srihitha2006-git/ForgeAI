@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import ProductCatalog from './components/ProductCatalog';
 import ProductDetails from './components/ProductDetails';
 import AuthModal from './components/AuthModal';
+import Chatbot from './components/Chatbot';
 import CartPage from './pages/CartPage';
 import WishlistPage from './pages/WishlistPage';
 import AddressPage from './pages/AddressPage';
@@ -431,6 +432,11 @@ export default function App() {
         onSuccess={handleAuthSuccess}
         apiUrl={API_URL}
       />
+
+      {/* ForgeAI AI Shopping Assistant Chatbot (Customer Facing) */}
+      {!route.page.startsWith('admin') && (
+        <Chatbot />
+      )}
 
       {/* Toast Notification Container */}
       {toastMessage && (

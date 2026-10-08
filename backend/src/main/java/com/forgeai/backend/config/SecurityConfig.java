@@ -57,6 +57,9 @@ public class SecurityConfig {
                 // Public product browsing endpoints
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
 
+                // Public AI Chatbot endpoints (Phase 5A)
+                .requestMatchers(HttpMethod.POST, "/api/chat", "/api/chat/**").permitAll()
+
                 // Inventory read endpoints retain intended public access
                 .requestMatchers(HttpMethod.GET, "/api/inventory/**").permitAll()
 
